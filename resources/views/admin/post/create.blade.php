@@ -31,6 +31,25 @@
           @enderror
         </div>
 
+        {{-- Select Categoria  --}}
+        <div class="form-group">
+          <label for="category">Categoria</label>
+          <select name="category_id" class="custom-select" @error('category_id') is-invalid @enderror>
+            <option value=""> Nessuna Categoria </option>
+            @foreach ($categories as $category) 
+              <option  @if(old('category_id') === $category->id) selected @endif value="{{$category->id}}"> {{$category->name}} </option>
+            @endforeach
+          </select>
+          <small id="helpCategory" class="form-text text-muted">Seleziona la Categoria del Post</small>
+          @error('category_id')
+            <div id="category" class="invalid-feedback">
+              {{ $message }}
+            </div>
+          @enderror
+        </div>
+        
+
+
         <div class="form-group">
           <label for="content">Contenuto</label>
           <textarea class="form-control" id="content" name="content" rows="20" placeholder="Contenuto del post">{{ old('content') }}</textarea>
