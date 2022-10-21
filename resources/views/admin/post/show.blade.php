@@ -7,7 +7,7 @@
     <div class="col-8">
       <h1>{{ $post->title }}</h1>
       <p>{{ $post->slug }}</p>
-      <span> {{ $post->category->name }} </span>
+      <span> Categoria: {{ $post->category ? $post->category->name : 'nessuna categoria' }} </span> 
       <ul class="d-flex gap-2">
         <li>{{ $post->created_at }}</li>
         <li>{{ $post->updated_at }}</li>

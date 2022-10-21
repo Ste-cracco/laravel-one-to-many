@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Post;
 use App\Category;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -28,7 +29,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::all(); // Ricordare di importare il namespace della classe Category -> use App\Category;
+        $categories = Category::orderBy('name', 'asc')->get(); // Ricordare di importare il namespace della classe Category -> use App\Category;
+        
         return view('admin.post.create', compact('categories'));
     }
 
@@ -41,11 +43,15 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $params = $request->validate([
-            'title' => 'required|max:255|min:5',
+            'title' => 'required | max:255 | min:5',
             'content' => 'required',
+            'category_id' => 'nullable | exists:App\Category,id' // Ricordarsi di aggiungerlo al 'fillable'
         ]);
 
-        $params['slug'] = str_replace(' ', '-', $params['title']);
+        // Aggiungo controllo nella quale lo slug sia univoco
+        // Richiamo il metodo statico 'getUniqueSlugFrom' creato in Post.php
+
+        $params['slug'] = Post::getUniqueSlugFrom($params['title']);
 
         $post = Post::create($params);
 
@@ -71,7 +77,9 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        $categories = Category::orderBy('name', 'asc')->get(); // Ricordare di importare il namespace della classe Category -> use App\Category;
+        
+        return view('admin.post.edit', compact('categories', 'post')); // Gli passo $post per poter stampare i date nelle views
     }
 
     /**
@@ -83,7 +91,24 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        $params = $request->validate([
+            'title' => 'required | max:255 | min:5',
+            'content' => 'required',
+            'category_id' => 'nullable | exists:App\Category,id' // Ricordarsi di aggiungerlo al 'fillable'
+        ]);
+
+        // Aggiungo controllo: Se 'title' è diverso dalla proprietà title di $post allora rigeneriamo lo slug
+
+        if($params['title'] !== $post->title) {
+
+            // Richiamo il metodo statico 'getUniqueSlugFrom' creato in Post.php
+
+            $params['slug'] = Post::getUniqueSlugFrom($params['title']);
+        }
+
+        $post->update($params);
+
+        return redirect()->route('admin.post.show', $post);
     }
 
     /**
