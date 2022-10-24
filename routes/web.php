@@ -18,11 +18,12 @@ Route::get('/', function () {
 });
 
 
-Auth::routes();
+Auth::routes(); // Questo metodo statico della classe Auth registra tutte le rotte legate al Log-In
 
 // Route::middleware('auth')->get('/admin/home', 'Admin\HomeController@index')->name('admin.home');
 
-Route::middleware('auth')
+// Il Middleware esegue controlli sulle richieste prima di mandarle al Controller
+Route::middleware('auth') // Ricordarsi, in questo caso, di eliminare il constructor in 'HomeController'
     ->prefix('admin') // Prefisso sul percorso della rotta
     ->name('admin.') // Prefisso sul nome della rotta
     ->namespace('Admin') // Prefisso sul percorso del Controller
